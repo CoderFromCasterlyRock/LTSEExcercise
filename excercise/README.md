@@ -1,12 +1,7 @@
 
-
-**Cloning Repo**
-```
-git clone https://github.com/CoderFromCasterlyRock/LTSEExcercise.git
-```
-
 **Running Application**
 ```
+git clone https://github.com/CoderFromCasterlyRock/LTSEExcercise.git
 cd LTSEExcercise/excercise
 mvn clean install
 java -jar target/excercise-1.0.0-jar-with-dependencies.jar

@@ -54,7 +54,7 @@ public final class ExcerciseUtil{
 
     }
 
-    
+
     public static boolean isInvalidInteger( String number ){
         boolean isInvalid   = true;
         try{
