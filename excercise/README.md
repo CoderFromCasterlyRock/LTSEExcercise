@@ -3,12 +3,14 @@
 ```
 git clone https://github.com/CoderFromCasterlyRock/LTSEExcercise.git
 cd LTSEExcercise/excercise
-mvn clean install
+mvn clean install -Dmaven.test.skip=true
 java -jar target/excercise-1.0.0-jar-with-dependencies.jar
 ```
 
 **Running Tests**
-``` 
+```
+git clone https://github.com/CoderFromCasterlyRock/LTSEExcercise.git
+cd LTSEExcercise/excercise 
 mvn clean test
 ```
 
