@@ -3,13 +3,18 @@ package com.ltse.excercise.data;
 import com.google.gson.Gson;
 import org.slf4j.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+
 public final class TradeSerde{
 
-    private static final Gson GSON      = new Gson();
-    private static final Logger LOGGER  = LoggerFactory.getLogger( TradeSerde.class.getSimpleName() );
+    private static final Gson GSON              = new Gson();
+    private static final DateTimeFormatter DTF  = DateTimeFormatter.ofPattern("dd/M/yyyy HH:mm");
+    private static final Logger LOGGER          = LoggerFactory.getLogger( TradeSerde.class.getSimpleName() );
 
 
-    public static final RawTrade serialize( String data, String delimiter ){
+    public static final RawTrade deserialize(String data, String delimiter ){
 
         int index               = -1;
         RawTrade rawTrade       = null;
@@ -38,10 +43,23 @@ public final class TradeSerde{
     }
 
 
-
-    public static final String deserialize(  RawTrade trade ){
+    public static final String serializeToJson( RawTrade trade ){
         return GSON.toJson( trade );
     }
 
+    public static final RawTrade deserializeFromJson( String tradeInJson ){
+        return GSON.fromJson( tradeInJson, RawTrade.class );
+    }
+
+
+    public static final LocalDateTime parseTimestamp(String timestamp ){
+        try{
+            return LocalDateTime.parse( timestamp, DTF );
+        }catch( Exception e ){
+            LOGGER.warn("FAILED to parse timestamp [{}]", timestamp, e );
+        }
+
+        return null;
+    }
 
 }

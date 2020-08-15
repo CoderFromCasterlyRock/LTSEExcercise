@@ -4,6 +4,7 @@ import com.ltse.excercise.data.RawTrade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,8 +28,7 @@ public abstract class FilterRule {
     }
 
 
-    protected abstract boolean isFilteredOut( RawTrade trade );
-
+    protected abstract FilterResult isFilteredOut( int ruleNumber, RawTrade trade );
 
     protected final List<String> getSymbols( ){
         return symbols;
@@ -39,26 +39,33 @@ public abstract class FilterRule {
     }
 
 
-    public final void applyRule( List<RawTrade> trades, List<RawTrade> filteredList ){
+    public final List<FilterResult> applyRule( List<RawTrade> trades, List<RawTrade> filteredList ){
 
         LOGGER.info("Applying rule #{} [{}]", ruleNumber, ruleDefinition );
 
         int originalTradeSize       = trades.size();
+        List<FilterResult> results  = new ArrayList<>( );
         Iterator<RawTrade> iterator = trades.iterator();
 
         while( iterator.hasNext() ){
-            RawTrade trade = iterator.next();
+            RawTrade trade      = iterator.next();
+            FilterResult result = isFilteredOut( ruleNumber, trade);
 
-            if( isFilteredOut(trade) ){
-                filteredList.add( trade );
+            if( result.isFiltered() ){
                 //Remove the trade from the provided list as it was filtered out.
                 iterator.remove();
+
+                //Add the filtered trade to the filtered list
+                filteredList.add( trade );
             }
 
+            results.add( result );
         }
 
         int finalTradeSize       = trades.size();
-        LOGGER.info("Input [{}], Output [{}], Filtered [{}] trades {}", originalTradeSize, finalTradeSize, (originalTradeSize-finalTradeSize), NEWLINE);
+        LOGGER.info("Input [{}], Output [{}], Filtered [{}] trades.", originalTradeSize, finalTradeSize, (originalTradeSize-finalTradeSize) );
+
+        return results;
 
     }
 

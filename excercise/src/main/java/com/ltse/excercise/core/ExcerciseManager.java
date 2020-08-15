@@ -29,9 +29,9 @@ public final class ExcerciseManager{
     }
 
     public ExcerciseManager( String symbolFile, String brokerFile, String tradesFile ){
-        this.tradeFile  = tradesFile;
         this.symbols    = loadSymbols( symbolFile );
         this.brokers    = loadBrokers( brokerFile );
+        this.tradeFile  = tradesFile;
         this.filterRules= createRules( symbols, brokers );
 
     }
@@ -40,7 +40,7 @@ public final class ExcerciseManager{
     protected final void process( ){
         long startTime          = System.currentTimeMillis();
 
-        List<RawTrade> trades   = loadRawTrades( true, tradeFile );
+        List<RawTrade> trades   = loadTrades( true, tradeFile );
         List<RawTrade> filtered = new ArrayList<>( trades.size() );
 
         filterTrades( trades, filtered );
@@ -51,17 +51,17 @@ public final class ExcerciseManager{
 
 
     protected final void filterTrades( List<RawTrade> trades, List<RawTrade> filtered ){
-        LOGGER.info("Apply [{}] filtering rules to [{}] trades.", filterRules.length, trades.size() );
+        LOGGER.info("Applying [{}] filtering rules to [{}] trades.{}", filterRules.length, trades.size(), NEWLINE );
 
         for( FilterRule rule : filterRules ){
-            rule.applyRule( trades, filtered );
+            List<FilterResult> results = rule.applyRule( trades, filtered );
+            printFilteredResult( results );
         }
     }
 
 
-
     protected final void processOutput( List<RawTrade> trades, List<RawTrade> filtered ){
-        LOGGER.info("Generating output.");
+        LOGGER.info("Generating output with [{}] accepted and [{}] rejected trades.", trades.size(), filtered.size() );
 
         new OutputGenerator( "AcceptedBrokerId.txt", "AcceptedFullOrder.txt").generate( trades );
         new OutputGenerator(  "RejectedBrokerId.txt", "RejectedFullOrder.txt").generate( filtered );
@@ -100,7 +100,7 @@ public final class ExcerciseManager{
     }
 
 
-    public static final List<RawTrade> loadRawTrades( boolean skipHeader, String fileName ){
+    public static final List<RawTrade> loadTrades( boolean skipHeader, String fileName ){
 
         String delimiter        = ",";
         List<String> rawData    = loadDataFromFile( fileName);
@@ -113,8 +113,10 @@ public final class ExcerciseManager{
         List<RawTrade> trades   = new ArrayList<>( );
 
         for( int i=startingIndex; i< rawData.size(); i++ ){
-            RawTrade rawTrade   = TradeSerde.serialize( rawData.get(i), delimiter );
-            trades.add( rawTrade );
+            RawTrade rawTrade   = TradeSerde.deserialize( rawData.get(i), delimiter );
+            if( rawData != null ){
+                trades.add(rawTrade);
+            }
         }
 
         LOGGER.info( "Loaded [{}] trades from [{}] {}", trades.size(), fileName, NEWLINE );
@@ -122,5 +124,18 @@ public final class ExcerciseManager{
         return trades;
 
     }
+
+
+
+    protected final void printFilteredResult( List<FilterResult> results ){
+        for( FilterResult result : results ){
+            if( result.isFiltered() ){
+                LOGGER.warn("{}", result );
+            }
+        }
+
+        LOGGER.info("------------------------------------------------------- {}", NEWLINE );
+    }
+
 
 }

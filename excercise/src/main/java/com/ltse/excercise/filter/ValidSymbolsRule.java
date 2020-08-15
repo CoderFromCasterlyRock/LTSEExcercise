@@ -12,8 +12,16 @@ public final class ValidSymbolsRule extends FilterRule {
 
 
     @Override
-    protected final boolean isFilteredOut( RawTrade trade ){
-       return !getSymbols().contains( trade.getSymbol() );
+    protected final FilterResult isFilteredOut( int ruleNumber, RawTrade trade ){
+        String symbol    = trade.getSymbol();
+        boolean filtered = !getSymbols().contains( symbol );
+
+        if( filtered ) {
+            return FilterResult.filtered( ruleNumber, symbol + " not in symbols file", trade );
+        }else{
+            return FilterResult.OK( trade );
+        }
+
     }
 
 

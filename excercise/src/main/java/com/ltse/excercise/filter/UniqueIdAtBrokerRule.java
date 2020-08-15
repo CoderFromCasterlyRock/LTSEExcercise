@@ -17,20 +17,20 @@ public final class UniqueIdAtBrokerRule extends FilterRule {
 
 
     @Override
-    protected final boolean isFilteredOut( RawTrade trade  ){
+    protected final FilterResult isFilteredOut( int ruleNumber, RawTrade trade ){
 
         String brokerName           = trade.getBroker();
         String sequenceId           = trade.getSequenceId();
         Set<String> idSetForBroker  = brokerToIdMap.getOrDefault( brokerName, new HashSet<>( 1024 ) );
 
         if( idSetForBroker.contains(sequenceId) ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "Sequence " + sequenceId + " already exists for " + brokerName, trade );
         }
 
         idSetForBroker.add( sequenceId );
         brokerToIdMap.put(brokerName, idSetForBroker );
 
-        return false;
+        return FilterResult.OK( trade );
     }
 
 

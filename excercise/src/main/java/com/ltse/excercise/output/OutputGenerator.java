@@ -3,19 +3,18 @@ package com.ltse.excercise.output;
 import com.ltse.excercise.data.RawTrade;
 import com.ltse.excercise.data.TradeSerde;
 import com.ltse.excercise.util.ExcerciseUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
+import static com.ltse.excercise.util.ExcerciseUtil.*;
 
 public final class OutputGenerator {
 
     private final String miniFileName;
     private final String fullOrderFileName;
 
-    private static final String DELIMITER   = ",";
-    private static final Logger LOGGER      = LoggerFactory.getLogger( OutputGenerator.class.getSimpleName() );
+    private static final String DELIMITER       = ",";
+    private static final String MINI_HEADER     = "broker,sequence";
+    private static final String FULL_HEADER     = "Time stamp,broker,sequence,type,Symbol,Quantity,Price,Side";
 
     public OutputGenerator( String miniFileName, String fullOrderFileName ){
         this.miniFileName     = miniFileName;
@@ -24,38 +23,41 @@ public final class OutputGenerator {
 
 
     public final void generate( List<RawTrade> trades ){
+        generateMiniOrder( trades );
+        generateFullOrder( trades );
+    }
 
-        StringBuilder miniBuilder  = new StringBuilder( trades.size() );
-        StringBuilder fullBuilder  = new StringBuilder( trades.size() );
+
+    protected final void generateMiniOrder( List<RawTrade> trades ){
+
+        StringBuilder miniBuilder = new StringBuilder(16 * trades.size());
+        miniBuilder.append(MINI_HEADER).append( NEWLINE );
 
         for( RawTrade trade : trades ){
-            addBrokerAndSequenceId( miniBuilder, trade );
-            addTradeAsJson( fullBuilder, trade );
+            miniBuilder.append(trade.getBroker()).append(DELIMITER).append(trade.getSequenceId()).append(NEWLINE);
         }
 
-        boolean fileWritten   = ExcerciseUtil.writeDataToFile( miniFileName, miniBuilder.toString() );
-        if( fileWritten ){
-            LOGGER.info("Successfully generated [{}]", miniFileName );
-        }
-
-
-        boolean fileWritten2   = ExcerciseUtil.writeDataToFile( fullOrderFileName, fullBuilder.toString() );
-        if( fileWritten2 ){
-            LOGGER.info("Successfully generated [{}]", fullOrderFileName );
-        }
+        writeToFile(miniFileName, miniBuilder.toString());
 
     }
 
 
+    protected final void generateFullOrder( List<RawTrade> trades ){
 
-    protected final void addBrokerAndSequenceId( StringBuilder builder, RawTrade trade ){
-        builder.append( trade.getBroker() ).append( DELIMITER ).append(trade.getSequenceId() ).append(ExcerciseUtil.NEWLINE);
+       StringBuilder fullBuilder  = new StringBuilder( 256 * trades.size() );
+       fullBuilder.append( FULL_HEADER ).append(NEWLINE);
+
+       for( RawTrade trade : trades ){
+           fullBuilder.append( TradeSerde.serializeToJson(trade) ).append(NEWLINE );
+        }
+
+        writeToFile( fullOrderFileName, fullBuilder.toString() );
+
     }
 
 
-    protected final void addTradeAsJson( StringBuilder builder, RawTrade trade ){
-        builder.append( TradeSerde.deserialize(trade) ).append(ExcerciseUtil.NEWLINE );
+    protected final void writeToFile( String fileName, String data ){
+        ExcerciseUtil.writeDataToFile( fileName, data );
     }
-
 
 }

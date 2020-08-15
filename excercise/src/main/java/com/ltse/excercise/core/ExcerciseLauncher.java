@@ -18,9 +18,7 @@ public final class ExcerciseLauncher {
         });
     }
 
-
-
-    public static void main( String args [] ){
+    public static void main( String[] args ){
         new ExcerciseManager().process();
     }
 

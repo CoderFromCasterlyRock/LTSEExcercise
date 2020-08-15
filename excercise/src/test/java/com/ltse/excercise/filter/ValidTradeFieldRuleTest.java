@@ -13,13 +13,14 @@ import static org.assertj.core.api.Assertions.*;
 
 public class ValidTradeFieldRuleTest {
 
+    private final int ruleNumber            = 1;
     private final ValidTradeFieldsRule rule = new ValidTradeFieldsRule( TestHelper.TEST_SYMBOLS, TestHelper.TEST_BROKERS );
 
 
     @Test
     public void valid_trade(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "1", "2", "symbol1", "10", "99.0", "Buy" );
-        assertThat( rule.isFilteredOut(trade1) ).isFalse();
+        assertThat( rule.isFilteredOut(ruleNumber, trade1).isFiltered() ).isFalse();
     }
 
 
@@ -50,41 +51,41 @@ public class ValidTradeFieldRuleTest {
     @Test
     public void empty_broker(){
         RawTrade trade1 = new RawTrade( "time1", "", "seq1", "type1", "symbol1", "qty1", "price1", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 
     @Test
     public void empty_symbol(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "seq1", "type1", "", "qty1", "price1", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 
     @Test
     public void empty_type(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "seq1", "", "symbol1", "qty1", "price1", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
     @Test
     public void type_not_K_OR_2(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "seq1", "L", "symbol1", "qty1", "price1", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 
     @Test
     public void empty_quantity(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "seq1", "2", "symbol1", "", "price1", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 
     @Test
     public void non_numeric_quantity(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "seq1", "2", "symbol1", "AA", "price1", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 
@@ -92,41 +93,41 @@ public class ValidTradeFieldRuleTest {
     @Test
     public void empty_price(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "seq1", "2", "symbol1", "10", "", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 
     @Test
     public void non_numeric_price(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "seq1", "2", "symbol1", "10", "AA", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
     @Test
     public void empty_side(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "", "2", "symbol1", "10", "99.0", "" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 
     @Test
     public void side_not_buy_not_sell(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "AA", "2", "symbol1", "10", "99.0", "short sell" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 
     @Test
     public void empty_sequenceId(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "", "2", "symbol1", "10", "price1", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered() ).isTrue();
     }
 
 
     @Test
     public void non_numeric_sequenceId(){
         RawTrade trade1 = new RawTrade( "time1", "broker1", "AA", "2", "symbol1", "10", "price1", "side1" );
-        assertThat( rule.isFilteredOut(trade1) ).isTrue();
+        assertThat( rule.isFilteredOut(ruleNumber,trade1).isFiltered()  ).isTrue();
     }
 
 

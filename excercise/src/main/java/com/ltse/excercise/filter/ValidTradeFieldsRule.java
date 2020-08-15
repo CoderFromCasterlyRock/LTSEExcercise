@@ -19,51 +19,49 @@ public final class ValidTradeFieldsRule extends FilterRule {
 
 
     @Override
-    protected final boolean isFilteredOut( RawTrade trade ){
+    protected final FilterResult isFilteredOut( int ruleNumber, RawTrade trade ){
 
         if( trade == null ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "Trade is null", null );
         }
 
         if( isInvalid(trade.getBroker()) ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "Broker is invalid", trade );
         }
 
         if( isInvalid(trade.getSymbol()) ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "Symbol is invalid", trade );
         }
 
         if( isTypeInvalid(trade.getType()) ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "TradeType is invalid", trade );
         }
 
         if( isInvalidInteger(trade.getQuantity()) ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "Quantity is invalid", trade );
         }
 
         if( isInvalidInteger(trade.getSequenceId()) ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "SequenceId is invalid", trade );
         }
 
         if( isSideInvalid(trade.getSide()) ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "Side is invalid", trade );
         }
 
         if( isInvalidDouble(trade.getPrice()) ){
-            return true;
+            return FilterResult.filtered( ruleNumber, "Price is invalid", trade );
         }
 
-        return false;
+        return FilterResult.OK( trade );
 
     }
 
-
-    private static final boolean isTypeInvalid( String type ){
+    protected final boolean isTypeInvalid( String type ){
         return !VALID_TYPE.contains(type);
     }
 
-
-    private static final boolean isSideInvalid( String side ){
+    protected final boolean isSideInvalid( String side ){
         return !VALID_SIDE.contains(side);
     }
 
