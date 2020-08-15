@@ -17,22 +17,42 @@ public final class ExcerciseUtil{
     public static final String NEWLINE = "\n";
 
 
-    public static final List<String> loadDataFromFile(String fileName ){
+    public static final List<String> loadDataFromFile( String fileName ){
 
-        List<String> list   = null;
-                                 
-        try{            
-            URI uri         = ExcerciseUtil.class.getClassLoader( ).getResource( fileName ).toURI( );            
-            list            = Files.readAllLines( Paths.get( uri ) );
+        InputStream instream    = null;
+        BufferedReader bstream  = null;
+        List<String> list       = new ArrayList<>();
 
-        }catch( URISyntaxException | IOException e ){
-            throw new RuntimeException("FAILED to load file " + fileName );
+        try{
+
+            instream            = ExcerciseUtil.class.getClassLoader( ).getResourceAsStream( "/" + fileName);
+            if( instream == null ){
+                instream        = ExcerciseUtil.class.getClassLoader().getResourceAsStream( fileName );
+            }
+
+            String line         = null;
+            bstream             = new BufferedReader(new InputStreamReader(instream) );
+            while( (line = bstream.readLine() ) != null ){
+                list.add( line );
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load file from " + fileName );
+
+        }finally{
+            try {
+                if( instream != null ) instream.close();
+            } catch (IOException e) {}
+
+            try {
+                if( bstream != null ) bstream.close();
+            } catch (IOException e) {}
+
         }
-        
-        return list;
-    
-    }
 
+        return list;
+
+    }
 
     public static final boolean writeDataToFile( String fileName, String data ){
 

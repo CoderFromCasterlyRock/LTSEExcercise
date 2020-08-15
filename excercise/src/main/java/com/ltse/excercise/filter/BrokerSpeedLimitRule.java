@@ -1,6 +1,7 @@
 package com.ltse.excercise.filter;
 
 import com.ltse.excercise.data.RawTrade;
+import com.ltse.excercise.util.SpeedChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

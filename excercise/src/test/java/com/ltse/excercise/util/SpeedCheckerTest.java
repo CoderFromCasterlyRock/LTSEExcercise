@@ -1,5 +1,6 @@
-package com.ltse.excercise.filter;
+package com.ltse.excercise.util;
 
+import com.ltse.excercise.util.SpeedChecker;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
